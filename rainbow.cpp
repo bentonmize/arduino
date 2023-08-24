@@ -1,4 +1,5 @@
 #include "rainbow.h"
+#include "ring.h"
 
 Color colors[] = {
     {255, 0, 0},        // red
@@ -26,6 +27,16 @@ uint32_t getRandomColor(Adafruit_NeoPixel& ring) {
   );
 
   return color;
+}
+
+void pulseColor(Adafruit_NeoPixel& ring, Pulse& pulse) {
+  Color c = colors[0];
+
+  ring.fill(ring.Color(c.r, c.g, c.b), 0, ring.numPixels());
+
+  pulse.run(ring);
+
+  delay(50);
 }
 
 void rainbow(Adafruit_NeoPixel& ring) {

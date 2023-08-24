@@ -3,6 +3,7 @@
 
 #include <Adafruit_NeoPixel.h>
 #include <Arduino.h>
+#include "ring.h"
 
 class Color {
     public:
@@ -16,5 +17,6 @@ class Color {
 
 void rainbow(Adafruit_NeoPixel& pixels);
 void rainbowSpin(Adafruit_NeoPixel& pixels);
+void pulseColor(Adafruit_NeoPixel& pixels, Pulse& pulse);
 
 #endif

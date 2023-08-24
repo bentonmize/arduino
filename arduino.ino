@@ -10,6 +10,7 @@
 #include "arc.h"
 #include "rainbow.h"
 #include "pitches.h"
+#include "ring.h"
 #ifdef __AVR__
  #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
@@ -35,7 +36,8 @@ void setup() {
 }
 
 long bored = 0;
-String command = "arc";
+String command = "pulse";
+Pulse pulse(8, true, 8, 32, 2);
 
 void clearRing() {
   ring.clear();
@@ -54,6 +56,8 @@ void loop() {
       rainbowSpin(ring);
     } else if(command == "rainbow") {
       rainbow(ring);
+    } else if(command == "pulse") {
+      pulseColor(ring, pulse);
     } else if(command == "") {
       // Idle states
     } else {
