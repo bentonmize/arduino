@@ -29,17 +29,17 @@ uint32_t getRandomColor(Adafruit_NeoPixel& ring) {
 }
 
 void rainbow(Adafruit_NeoPixel& ring) {
-  ring.setBrightness(64);
+  ring.setBrightness(BRIGHTNESS);
 
   ring.fill(getRandomColor(ring), 0, ring.numPixels());
 
   ring.show();
 
-  delay(500);
+  delay(250);
 }
 
 void rainbowSpin(Adafruit_NeoPixel& ring) {
-  ring.setBrightness(64);
+  ring.setBrightness(BRIGHTNESS);
 
   for(int i=0; i<ring.numPixels(); i++) {
     ring.setPixelColor(i, getRandomColor(ring));

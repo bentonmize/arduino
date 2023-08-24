@@ -6,8 +6,8 @@ int arcBrightness = 0;
 int arcMinBrightness = 0;
 boolean arcBrightnessRising = true;
 boolean arcComplete = false;
-
 uint8_t arcRotationPin[4] = {0, 1, 2, 3};
+uint8_t delayCount = 0;
 
 void arcReset() {
   arcCount = 0;
@@ -49,21 +49,42 @@ void arcReactor(Adafruit_NeoPixel& ring) {
 
     delay(arcDelay);
   } else {
-      // Do a slight rotation animation here after "pulse start"
-      ring.fill(reactorColor, 0, ring.numPixels());
-      ring.setPixelColor(arcRotationPin[0], 0, 128, 128);
-      ring.setPixelColor(arcRotationPin[1], 0, 128, 128);
-      ring.setPixelColor(arcRotationPin[2], 0, 200, 200);
-      ring.setPixelColor(arcRotationPin[3], 0, 128, 128);
+    // Do a slight rotation animation here after "pulse start"
+    ring.fill(reactorColor, 0, ring.numPixels());
+    ring.setPixelColor(arcRotationPin[0], 0, 128, 128);
+    ring.setPixelColor(arcRotationPin[1], 0, 128, 128);
+    ring.setPixelColor(arcRotationPin[2], 0, 200, 200);
+    ring.setPixelColor(arcRotationPin[3], 0, 128, 128);
 
-      for(int i = 0; i < 4; i++) {
-        arcRotationPin[i] = arcRotationPin[i] + 1;
-        if(arcRotationPin[i] >= ring.numPixels()) {
-          arcRotationPin[i] = 0;
-        }
+    for(int i = 0; i < 4; i++) {
+      arcRotationPin[i] = arcRotationPin[i] + 1;
+      if(arcRotationPin[i] >= ring.numPixels()) {
+        arcRotationPin[i] = 0;
+      }
+    }
+    
+    if(delayCount < MAX_DELAY_COUNT) {
+      if(arcBrightnessRising) {
+        arcBrightness += ARC_PULSE_BRIGHT_INT;
+      } else {
+        arcBrightness -= ARC_PULSE_BRIGHT_INT;
       }
 
-      delay(15);
+      if(arcBrightness > ARC_PULSE_MAX_BRIGHT) {
+        arcBrightnessRising = false;
+        arcBrightness = ARC_PULSE_MAX_BRIGHT;
+      } else if(arcBrightness < ARC_PULSE_MIN_BRIGHT) {
+        arcBrightnessRising = true;
+        arcBrightness = ARC_PULSE_MIN_BRIGHT;
+      }
+
+      ring.setBrightness(arcBrightness);
+    } else {
+      delayCount = 0;
+    }
+    delayCount++;
+
+    delay(15);
   }
 
   ring.show();

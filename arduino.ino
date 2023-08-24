@@ -31,17 +31,23 @@ void setup() {
     delay(10);
   }
 
-  Serial.println("Huzzah!");
+  Serial.println("Initialized!");
 }
 
 long bored = 0;
-String command = "spin";
+String command = "arc";
+
+void clearRing() {
+  ring.clear();
+  ring.show();
+}
 
 void loop() {
-  // rainbow(pixels);  
-  // arcReactor(pixels);
+  // Clear the ring
+  clearRing();
+
+  // Main loop when we're not taking serial commands
   while(Serial.available() == 0) {
-    // Do something while data is unavailable
     if(command == "arc") {
       arcReactor(ring);
     } else if(command == "spin") {
@@ -51,13 +57,17 @@ void loop() {
     } else if(command == "") {
       // Idle states
     } else {
+      // Reset the arc variables if we stop using it
       arcReset();
-      ring.clear();
-      ring.show();
+
+      // Clear the ring
+      clearRing();
+
       command = "";
     }
   }
 
+  // Get a command (we'll parse it in the loop above)
   command = Serial.readString();
   command.trim();
   Serial.println(command);
