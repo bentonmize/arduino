@@ -7,7 +7,7 @@
 class Pulse {
     public:
         Pulse(int brightness, boolean rising, int min, int max, int change);
-        void run(Adafruit_NeoPixel& ring);
+        uint8_t run();
     
     private:
         int _brightness;

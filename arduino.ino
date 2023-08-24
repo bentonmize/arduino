@@ -36,8 +36,8 @@ void setup() {
 }
 
 long bored = 0;
-String command = "pulse";
-Pulse pulse(8, true, 8, 32, 2);
+String command = "fire";
+Pulse pulse(8, true, 4, 32, 1);
 
 void clearRing() {
   ring.clear();
@@ -58,7 +58,9 @@ void loop() {
       rainbow(ring);
     } else if(command == "pulse") {
       pulseColor(ring, pulse);
-    } else if(command == "") {
+    } else if(command == "fire") {
+      fire(ring);
+    }else if(command == "") {
       // Idle states
     } else {
       // Reset the arc variables if we stop using it

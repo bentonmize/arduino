@@ -8,7 +8,7 @@ Pulse::Pulse(int brightness, boolean rising, int min, int max, int change) {
     _change = change;
 }
 
-void Pulse::run(Adafruit_NeoPixel& ring) {
+uint8_t Pulse::run() {
     if(this->_rising) {
         this->_brightness += this->_change;
     } else {
@@ -23,6 +23,5 @@ void Pulse::run(Adafruit_NeoPixel& ring) {
         this->_brightness = this->_min;
     }
 
-    ring.setBrightness(this->_brightness);
-    ring.show();
+    return this->_brightness;
 }
