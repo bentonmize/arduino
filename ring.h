@@ -17,4 +17,6 @@ class Pulse {
         int _change;
 };
 
+void pulsePixel(Adafruit_NeoPixel& ring, int color, int pixel);
+
 #endif

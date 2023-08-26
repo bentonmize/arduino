@@ -31,7 +31,7 @@ uint32_t getRandomColor(Adafruit_NeoPixel& ring) {
 }
 
 uint32_t getFireColor(Adafruit_NeoPixel& ring) {
-  uint8_t r = random(128, 255);
+  uint8_t r = random(180, 255);
   uint8_t g = random(64, 128);
 
   if(g > r) {

@@ -25,3 +25,12 @@ uint8_t Pulse::run() {
 
     return this->_brightness;
 }
+
+void pulsePixel(Adafruit_NeoPixel& ring, int color, int pixel) {
+    int index = pixel % ring.numPixels();
+
+    ring.setPixelColor(index, color);
+    ring.setBrightness(255);
+    ring.show();
+    delay(20);
+}

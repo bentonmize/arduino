@@ -51,10 +51,10 @@ void arcReactor(Adafruit_NeoPixel& ring) {
   } else {
     // Do a slight rotation animation here after "pulse start"
     ring.fill(reactorColor, 0, ring.numPixels());
-    ring.setPixelColor(arcRotationPin[0], 0, 128, 128);
-    ring.setPixelColor(arcRotationPin[1], 0, 128, 128);
-    ring.setPixelColor(arcRotationPin[2], 0, 200, 200);
-    ring.setPixelColor(arcRotationPin[3], 0, 128, 128);
+    ring.setPixelColor(arcRotationPin[0], 0, 180, 180);
+    ring.setPixelColor(arcRotationPin[1], 0, 180, 180);
+    ring.setPixelColor(arcRotationPin[2], 0, 180, 180);
+    ring.setPixelColor(arcRotationPin[3], 0, 180, 180);
 
     for(int i = 0; i < 4; i++) {
       arcRotationPin[i] = arcRotationPin[i] + 1;
