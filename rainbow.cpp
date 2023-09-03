@@ -47,12 +47,13 @@ void fire(Adafruit_NeoPixel&ring) {
   }
 
   ring.setBrightness(random(8, 32));
+  // ring.setBrightness(random(8, 64));
   ring.show();
   delay(100);
 }
 
 void pulseColor(Adafruit_NeoPixel& ring, Pulse& pulse) {
-  Color c = colors[4];
+  Color c = colors[7];
 
   ring.fill(ring.Color(c.r, c.g, c.b), 0, ring.numPixels());
 
