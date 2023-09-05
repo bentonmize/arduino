@@ -36,7 +36,7 @@ void setup() {
 }
 
 long bored = 0;
-String command = "";
+String command = "fire";
 Pulse pulse(8, true, 1, 40, 1);
 
 void clearRing() {

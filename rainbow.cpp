@@ -46,7 +46,7 @@ void fire(Adafruit_NeoPixel&ring) {
     ring.setPixelColor(i, getFireColor(ring));
   }
 
-  ring.setBrightness(random(8, 32));
+  ring.setBrightness(random(8, 16));
   // ring.setBrightness(random(8, 64));
   ring.show();
   delay(100);
