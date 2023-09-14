@@ -32,12 +32,28 @@ void setup() {
     delay(10);
   }
 
+  pinMode(2, INPUT);
+
   Serial.println("Initialized!");
 }
 
-long bored = 0;
-String command = "fire";
+String command = "";
 Pulse pulse(8, true, 1, 40, 1);
+
+int buttonState = LOW;
+int outputState = LOW;
+long lastTime = 0;
+
+int debounceRead(int pin, int delay) {
+  buttonState = digitalRead(pin);
+
+  if((millis() - lastTime) > delay) {
+    if(buttonState == HIGH) {
+      outputState = !outputState;
+    }
+    lastTime = millis();
+  }
+}
 
 void clearRing() {
   ring.clear();
@@ -76,6 +92,13 @@ void loop() {
       clearRing();
 
       command = "";
+    }
+
+    debounceRead(2, 100);
+    if(outputState == HIGH) {
+      command = "fire";
+    } else {
+      command = "stop";
     }
   }
 
