@@ -40,19 +40,32 @@ void setup() {
 String command = "";
 Pulse pulse(8, true, 1, 40, 1);
 
+int prevButtonState = LOW;
 int buttonState = LOW;
+int prevOutputState = LOW;
 int outputState = LOW;
 long lastTime = 0;
 
 int debounceRead(int pin, int delay) {
   buttonState = digitalRead(pin);
 
-  if((millis() - lastTime) > delay) {
-    if(buttonState == HIGH) {
-      outputState = !outputState;
-    }
+  if(buttonState != prevButtonState) {
     lastTime = millis();
   }
+
+  if((millis() - lastTime) > delay) {
+    outputState = buttonState;
+    if(prevOutputState == LOW && outputState == HIGH) {
+      if(command == "fire") {
+        command = "stop";
+      } else {
+        command = "fire";
+      }
+    }
+  }
+
+  prevOutputState = outputState;
+  prevButtonState = buttonState;
 }
 
 void clearRing() {
@@ -94,12 +107,7 @@ void loop() {
       command = "";
     }
 
-    debounceRead(2, 100);
-    if(outputState == HIGH) {
-      command = "fire";
-    } else {
-      command = "stop";
-    }
+    debounceRead(2, 5);
   }
 
   // Get a command (we'll parse it in the loop above)
