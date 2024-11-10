@@ -41,6 +41,27 @@ uint32_t getFireColor(Adafruit_NeoPixel& ring) {
   return ring.Color(r, g, 0);
 }
 
+uint32_t getIceColor(Adafruit_NeoPixel& ring) {
+  uint8_t choice = random(3);
+
+  uint8_t min = 64;
+  uint8_t max = 128;
+
+  uint8_t color = random(64, min);
+  uint8_t blue = random(min, max);
+  uint8_t cyan = random(min, max);
+
+  switch(choice) {
+    default:
+    case 0:
+      return ring.Color(color, color, color);
+    case 1:
+      return ring.Color(0, cyan, blue);
+    case 2:
+      return ring.Color(0, cyan, cyan);
+  }
+}
+
 void fire(Adafruit_NeoPixel&ring) {
   for(int i=0; i<ring.numPixels(); i++) {
     ring.setPixelColor(i, getFireColor(ring));
@@ -52,8 +73,19 @@ void fire(Adafruit_NeoPixel&ring) {
   delay(100);
 }
 
-void pulseColor(Adafruit_NeoPixel& ring, Pulse& pulse) {
-  Color c = colors[7];
+void ice(Adafruit_NeoPixel&ring) {
+  for(int i=0; i<ring.numPixels(); i++) {
+    ring.setPixelColor(i, getIceColor(ring));
+  }
+
+  ring.setBrightness(random(6,16));
+  // ring.setBrightness(random(8, 64));
+  ring.show();
+  delay(75);
+}
+
+void pulseColor(Adafruit_NeoPixel& ring, Pulse& pulse, int index) {
+  Color c = colors[index];
 
   ring.fill(ring.Color(c.r, c.g, c.b), 0, ring.numPixels());
 

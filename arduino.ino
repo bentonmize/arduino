@@ -11,6 +11,7 @@
 #include "rainbow.h"
 #include "pitches.h"
 #include "ring.h"
+#include "dht.h"
 #ifdef __AVR__
  #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
@@ -39,33 +40,28 @@ void setup() {
 
 String command = "";
 Pulse pulse(8, true, 1, 40, 1);
+int count = 0;
+
+int outputState = LOW;
+int prevOutputState = LOW;
 
 int prevButtonState = LOW;
-int buttonState = LOW;
-int prevOutputState = LOW;
-int outputState = LOW;
-long lastTime = 0;
+int currentButtonState = LOW;
+long lastDebounceTime = 0;
 
 int debounceRead(int pin, int delay) {
-  buttonState = digitalRead(pin);
+  currentButtonState = digitalRead(pin);
 
-  if(buttonState != prevButtonState) {
-    lastTime = millis();
+  if(currentButtonState != prevButtonState) {
+    lastDebounceTime = millis();
   }
 
-  if((millis() - lastTime) > delay) {
-    outputState = buttonState;
-    if(prevOutputState == LOW && outputState == HIGH) {
-      if(command == "fire") {
-        command = "stop";
-      } else {
-        command = "fire";
-      }
-    }
+  if((millis() - lastDebounceTime) > delay) {
+      prevOutputState = outputState;
+      outputState = currentButtonState;
   }
 
-  prevOutputState = outputState;
-  prevButtonState = buttonState;
+  prevButtonState = currentButtonState;
 }
 
 void clearRing() {
@@ -86,9 +82,16 @@ void loop() {
     } else if(command == "rainbow") {
       rainbow(ring);
     } else if(command == "pulse") {
-      pulseColor(ring, pulse);
+      int index = count % 12;
+      pulseColor(ring, pulse, index);
+    } else if(command == "ice") {
+      ice(ring);
     } else if(command == "fire") {
-      fire(ring);
+      if(count % 2 == 0) {
+        fire(ring);
+      } else {
+        ice(ring);
+      }
     } else if(command == "pixels") {
       int pixelPulse = pulse.run();
       int color = ring.Color(0, 0, pixelPulse);
@@ -107,7 +110,17 @@ void loop() {
       command = "";
     }
 
-    debounceRead(2, 5);
+    debounceRead(2, 1);
+
+    if(prevOutputState == HIGH && outputState == LOW) {
+      if(command != "fire") {
+        count++;
+        command = "fire";
+      } else {
+        command = "stop";
+      }
+      Serial.println(command);
+    }
   }
 
   // Get a command (we'll parse it in the loop above)
