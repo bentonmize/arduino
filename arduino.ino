@@ -39,6 +39,7 @@ void setup() {
 
 String command = "";
 String subcommand = "";
+String originalCommand = "";
 
 Pulse pulse(8, true, 1, 12, 1);
 int count = 0;
@@ -133,12 +134,13 @@ void loop() {
   command = Serial.readString();
   command.trim();
 
+  originalCommand = command;
+
   uint8_t spaceIndex = command.indexOf('-');
   if(spaceIndex > 0) {
     subcommand = command.substring(spaceIndex+1);
     command = command.substring(0, spaceIndex);
-    Serial.println(subcommand);
   }
 
-  Serial.println(command);
+  Serial.println(originalCommand);
 }
