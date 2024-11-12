@@ -9,9 +9,8 @@
 #include <Adafruit_NeoPixel.h>
 #include "arc.h"
 #include "rainbow.h"
-#include "pitches.h"
 #include "ring.h"
-#include "dht.h"
+
 #ifdef __AVR__
  #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
@@ -39,7 +38,9 @@ void setup() {
 }
 
 String command = "";
-Pulse pulse(8, true, 1, 40, 1);
+String subcommand = "";
+
+Pulse pulse(8, true, 1, 12, 1);
 int count = 0;
 
 int outputState = LOW;
@@ -82,8 +83,11 @@ void loop() {
     } else if(command == "rainbow") {
       rainbow(ring);
     } else if(command == "pulse") {
-      int index = count % 12;
-      pulseColor(ring, pulse, index);
+      if(subcommand == "green") {
+        pulseColor(ring, pulse, 4);
+      } else if(subcommand == "red") {
+        pulseColor(ring, pulse, 0);
+      }
     } else if(command == "ice") {
       ice(ring);
     } else if(command == "fire") {
@@ -98,6 +102,20 @@ void loop() {
       pulsePixel(ring, color, 8);
       pulsePixel(ring, color, 9);
       pulsePixel(ring, color, 10);
+    } else if(command == "progress") {
+      if(subcommand == "red") {
+        arcProgress(ring, 255, 0, 0);
+      } else if(subcommand == "purple") {
+        arcProgress(ring, 127, 0, 255);
+      }else if(subcommand == "green") {
+        arcProgress(ring, 0, 255, 0);
+      } else if(subcommand == "yellow") {
+        arcProgress(ring, 255, 255, 0);
+      } else if(subcommand == "blue") {
+        arcProgress(ring, 0, 0, 255);
+      } else if(subcommand == "white") {
+        arcProgress(ring, 255, 255, 255);
+      }
     } else if(command == "") {
       // Idle states
     } else {
@@ -109,22 +127,18 @@ void loop() {
 
       command = "";
     }
-
-    debounceRead(2, 1);
-
-    if(prevOutputState == HIGH && outputState == LOW) {
-      if(command != "fire") {
-        count++;
-        command = "fire";
-      } else {
-        command = "stop";
-      }
-      Serial.println(command);
-    }
   }
 
   // Get a command (we'll parse it in the loop above)
   command = Serial.readString();
   command.trim();
+
+  uint8_t spaceIndex = command.indexOf('-');
+  if(spaceIndex > 0) {
+    subcommand = command.substring(spaceIndex+1);
+    command = command.substring(0, spaceIndex);
+    Serial.println(subcommand);
+  }
+
   Serial.println(command);
 }

@@ -18,6 +18,54 @@ void arcReset() {
   arcComplete = false;
 }
 
+void arcProgress(Adafruit_NeoPixel& ring, uint8_t r, uint8_t g, uint8_t b) {
+  uint32_t reactorColor = ring.Color(r, g, b);
+  uint8_t max = 12;
+  
+  ring.fill(reactorColor, 0, ring.numPixels()); 
+  ring.setBrightness(arcBrightness);
+
+  ring.fill(reactorColor, 0, ring.numPixels());
+  ring.setPixelColor(arcRotationPin[0], r, g, b);
+  ring.setPixelColor(arcRotationPin[1], r/2, g/2, b/2);
+  ring.setPixelColor(arcRotationPin[2], r/3, g/3, b/3);
+  ring.setPixelColor(arcRotationPin[3], r/3, g/3, b/3);
+  ring.setPixelColor(arcRotationPin[4], r/4, g/4, b/4);
+  ring.setPixelColor(arcRotationPin[5], r/4, g/4, b/4);
+
+  for(int i = 0; i < 6; i++) {
+    arcRotationPin[i] = arcRotationPin[i] + 1;
+    if(arcRotationPin[i] >= ring.numPixels()) {
+      arcRotationPin[i] = 0;
+    }
+  }
+  
+  if(delayCount < MAX_DELAY_COUNT) {
+    if(arcBrightnessRising) {
+      arcBrightness += ARC_PULSE_BRIGHT_INT;
+    } else {
+      arcBrightness -= ARC_PULSE_BRIGHT_INT;
+    }
+
+    if(arcBrightness > max) {
+      arcBrightnessRising = false;
+      arcBrightness = max;
+    } else if(arcBrightness < ARC_PULSE_MIN_BRIGHT) {
+      arcBrightnessRising = true;
+      arcBrightness = ARC_PULSE_MIN_BRIGHT;
+    }
+
+    ring.setBrightness(arcBrightness);
+  } else {
+    delayCount = 0;
+  }
+  delayCount++;
+
+  delay(35);
+
+  ring.show();
+}
+
 void arcReactor(Adafruit_NeoPixel& ring) {
   uint32_t reactorColor = ring.Color(0, 255, 255);
   

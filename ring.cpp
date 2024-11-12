@@ -23,6 +23,8 @@ uint8_t Pulse::run() {
         this->_brightness = this->_min;
     }
 
+    delay(30);
+
     return this->_brightness;
 }
 

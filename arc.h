@@ -15,6 +15,7 @@
 #define MAX_DELAY_COUNT 3
 
 void arcReactor(Adafruit_NeoPixel& pixels);
+void arcProgress(Adafruit_NeoPixel& ring, uint8_t r, uint8_t g, uint8_t b);
 void arcReset();
 
 #endif

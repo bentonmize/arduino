@@ -1,19 +1,19 @@
 #include "rainbow.h"
 #include "ring.h"
 
-Color colors[] = {
-    {255, 0, 0},        // red 0
-    {255, 128, 0},      // orange 1
-    {255, 255, 0},      // yellow 2
-    {128, 255, 0},      // light green 3
-    {0, 255, 0},        // green 4
-    {255, 128, 0},      // teal 5
-    {0, 255, 255},      // marine 6
-    {0, 0, 255},        // blue 7
-    {127, 0, 255},      // purple 8
-    {255, 0, 255},      // magenta 9
-    {255, 0, 127},      // pink 10
-    {255, 255, 255},    // white 11
+extern Color colors[] = {
+  { 255, 0, 0 },      // red 0
+  { 255, 128, 0 },    // orange 1
+  { 255, 255, 0 },    // yellow 2
+  { 128, 255, 0 },    // light green 3
+  { 0, 255, 0 },      // green 4
+  { 255, 128, 0 },    // teal 5
+  { 0, 255, 255 },    // marine 6
+  { 0, 0, 255 },      // blue 7
+  { 127, 0, 255 },    // purple 8
+  { 255, 0, 255 },    // magenta 9
+  { 255, 0, 127 },    // pink 10
+  { 255, 255, 255 },  // white 11
 };
 
 uint32_t getRandomColor(Adafruit_NeoPixel& ring) {
@@ -22,10 +22,9 @@ uint32_t getRandomColor(Adafruit_NeoPixel& ring) {
   Color c = colors[colorIndex];
 
   uint32_t color = ring.Color(
-      c.r,
-      c.g,
-      c.b
-  );
+    c.r,
+    c.g,
+    c.b);
 
   return color;
 }
@@ -34,7 +33,7 @@ uint32_t getFireColor(Adafruit_NeoPixel& ring) {
   uint8_t r = random(180, 255);
   uint8_t g = random(64, 128);
 
-  if(g > r) {
+  if (g > r) {
     g = r;
   }
 
@@ -51,7 +50,7 @@ uint32_t getIceColor(Adafruit_NeoPixel& ring) {
   uint8_t blue = random(min, max);
   uint8_t cyan = random(min, max);
 
-  switch(choice) {
+  switch (choice) {
     default:
     case 0:
       return ring.Color(color, color, color);
@@ -62,8 +61,8 @@ uint32_t getIceColor(Adafruit_NeoPixel& ring) {
   }
 }
 
-void fire(Adafruit_NeoPixel&ring) {
-  for(int i=0; i<ring.numPixels(); i++) {
+void fire(Adafruit_NeoPixel& ring) {
+  for (int i = 0; i < ring.numPixels(); i++) {
     ring.setPixelColor(i, getFireColor(ring));
   }
 
@@ -73,12 +72,12 @@ void fire(Adafruit_NeoPixel&ring) {
   delay(100);
 }
 
-void ice(Adafruit_NeoPixel&ring) {
-  for(int i=0; i<ring.numPixels(); i++) {
+void ice(Adafruit_NeoPixel& ring) {
+  for (int i = 0; i < ring.numPixels(); i++) {
     ring.setPixelColor(i, getIceColor(ring));
   }
 
-  ring.setBrightness(random(6,16));
+  ring.setBrightness(random(6, 16));
   // ring.setBrightness(random(8, 64));
   ring.show();
   delay(75);
@@ -111,7 +110,7 @@ void rainbow(Adafruit_NeoPixel& ring) {
 void rainbowSpin(Adafruit_NeoPixel& ring) {
   ring.setBrightness(BRIGHTNESS);
 
-  for(int i=0; i<ring.numPixels(); i++) {
+  for (int i = 0; i < ring.numPixels(); i++) {
     ring.setPixelColor(i, getRandomColor(ring));
   }
 
