@@ -14,18 +14,26 @@
 #ifdef __AVR__
  #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
+#include "NeoPixelSegment.h"
 
 #define NEO_PIN   6
-#define NUMPIXELS 12
+#define NUMPIXELS 13  // One ring and then an additional
 
-Adafruit_NeoPixel ring(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
+
+NeoPixelSegment* ring;
+NeoPixelSegment* single;
+
+int bright = 4;
 
 void setup() {
 #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
   clock_prescale_set(clock_div_1);
 #endif
 
-  ring.begin(); // init NeoPixel ring object (REQUIRED)
+  pixels.begin(); // init NeoPixel array object (REQUIRED)
+  ring = new NeoPixelSegment(&pixels, 0, 12);
+  single = new NeoPixelSegment(&pixels, 12, 1);
 
   Serial.begin(115200);
   while(!Serial) {
@@ -35,99 +43,78 @@ void setup() {
   pinMode(2, INPUT);
 
   Serial.println("Initialized!");
+
+  ring->fill(pixels.Color(150, 0, 0));
+  single->fill(pixels.Color(0, 0, 150));
+  ring->setPixelBrightness(3, bright);
+  ring->setBrightness(12);
 }
 
 String command = "";
 String subcommand = "";
 String originalCommand = "";
 
-Pulse pulse(8, true, 1, 12, 1);
-int count = 0;
-
-int outputState = LOW;
-int prevOutputState = LOW;
-
-int prevButtonState = LOW;
-int currentButtonState = LOW;
-long lastDebounceTime = 0;
-
-int debounceRead(int pin, int delay) {
-  currentButtonState = digitalRead(pin);
-
-  if(currentButtonState != prevButtonState) {
-    lastDebounceTime = millis();
-  }
-
-  if((millis() - lastDebounceTime) > delay) {
-      prevOutputState = outputState;
-      outputState = currentButtonState;
-  }
-
-  prevButtonState = currentButtonState;
-}
-
-void clearRing() {
-  ring.clear();
-  ring.show();
-}
-
 void loop() {
   // Clear the ring
-  clearRing();
+  // ring->clear();
 
   // Main loop when we're not taking serial commands
   while(Serial.available() == 0) {
-    if(command == "arc") {
-      arcReactor(ring);
-    } else if(command == "spin") {
-      rainbowSpin(ring);
-    } else if(command == "rainbow") {
-      rainbow(ring);
-    } else if(command == "pulse") {
-      if(subcommand == "green") {
-        pulseColor(ring, pulse, 4);
-      } else if(subcommand == "red") {
-        pulseColor(ring, pulse, 0);
-      }
-    } else if(command == "ice") {
-      ice(ring);
-    } else if(command == "fire") {
-      if(count % 2 == 0) {
-        fire(ring);
-      } else {
-        ice(ring);
-      }
-    } else if(command == "pixels") {
-      int pixelPulse = pulse.run();
-      int color = ring.Color(0, 0, pixelPulse);
-      pulsePixel(ring, color, 8);
-      pulsePixel(ring, color, 9);
-      pulsePixel(ring, color, 10);
-    } else if(command == "progress") {
-      if(subcommand == "red") {
-        arcProgress(ring, 255, 0, 0);
-      } else if(subcommand == "purple") {
-        arcProgress(ring, 127, 0, 255);
-      }else if(subcommand == "green") {
-        arcProgress(ring, 0, 255, 0);
-      } else if(subcommand == "yellow") {
-        arcProgress(ring, 255, 255, 0);
-      } else if(subcommand == "blue") {
-        arcProgress(ring, 0, 0, 255);
-      } else if(subcommand == "white") {
-        arcProgress(ring, 255, 255, 255);
-      }
-    } else if(command == "") {
-      // Idle states
-    } else {
-      // Reset the arc variables if we stop using it
-      arcReset();
+    delay(200);
 
-      // Clear the ring
-      clearRing();
+    ring->setPixelBrightness(3, bright++);
 
-      command = "";
-    }
+    // if(command == "arc") {
+    //   arcReactor(ring);
+    // } else if(command == "spin") {
+    //   rainbowSpin(ring);
+    // } else if(command == "rainbow") {
+    //   rainbow(ring);
+    // } else if(command == "pulse") {
+    //   if(subcommand == "green") {
+    //     pulseColor(ring, pulse, 4);
+    //   } else if(subcommand == "red") {
+    //     pulseColor(ring, pulse, 0);
+    //   }
+    // } else if(command == "ice") {
+    //   ice(ring);
+    // } else if(command == "fire") {
+    //   if(count % 2 == 0) {
+    //     fire(ring);
+    //   } else {
+    //     ice(ring);
+    //   }
+    // } else if(command == "pixels") {
+    //   int pixelPulse = pulse.run();
+    //   int color = ring.Color(0, 0, pixelPulse);
+    //   pulsePixel(ring, color, 8);
+    //   pulsePixel(ring, color, 9);
+    //   pulsePixel(ring, color, 10);
+    // } else if(command == "progress") {
+    //   if(subcommand == "red") {
+    //     arcProgress(ring, 255, 0, 0);
+    //   } else if(subcommand == "purple") {
+    //     arcProgress(ring, 127, 0, 255);
+    //   }else if(subcommand == "green") {
+    //     arcProgress(ring, 0, 255, 0);
+    //   } else if(subcommand == "yellow") {
+    //     arcProgress(ring, 255, 255, 0);
+    //   } else if(subcommand == "blue") {
+    //     arcProgress(ring, 0, 0, 255);
+    //   } else if(subcommand == "white") {
+    //     arcProgress(ring, 255, 255, 255);
+    //   }
+    // } else if(command == "") {
+    //   // Idle states
+    // } else {
+    //   // Reset the arc variables if we stop using it
+    //   arcReset();
+
+    //   // Clear the ring
+    //   clearRing();
+
+    //   command = "";
+    // }
   }
 
   // Get a command (we'll parse it in the loop above)
