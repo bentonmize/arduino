@@ -6,6 +6,7 @@
 // Released under the GPLv3 license to match the rest of the
 // Adafruit NeoPixel library
 
+#include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include "arc.h"
 #include "rainbow.h"
@@ -16,6 +17,8 @@
 #endif
 #include "NeoPixelSegment.h"
 
+#include "colors.h"
+
 #define NEO_PIN   6
 #define NUMPIXELS 13  // One ring and then an additional
 
@@ -25,6 +28,10 @@ NeoPixelSegment* ring;
 NeoPixelSegment* single;
 
 int bright = 4;
+bool bigger = true;
+int maxBright = 128;
+int minBright = 32;
+int scaleBright = 3;
 
 void setup() {
 #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
@@ -44,10 +51,11 @@ void setup() {
 
   Serial.println("Initialized!");
 
-  ring->fill(pixels.Color(150, 0, 0));
-  single->fill(pixels.Color(0, 0, 150));
-  ring->setPixelBrightness(3, bright);
-  ring->setBrightness(12);
+  ring->fill("green");
+  single->fill("blue");
+
+  single->setBrightness(4);
+  ring->setBrightness(8);
 }
 
 String command = "";
@@ -60,9 +68,27 @@ void loop() {
 
   // Main loop when we're not taking serial commands
   while(Serial.available() == 0) {
-    delay(200);
+    delay(25);
 
-    ring->setPixelBrightness(3, bright++);
+    if(bigger) {
+      bright += scaleBright;
+    } else {
+      bright -= scaleBright;
+    }
+
+    if(bright <= minBright) {
+      bigger = true;
+      bright = minBright;
+    } else if (bright >= maxBright) {
+      bright = maxBright;
+      bigger = false;
+    }
+
+    single->setBrightness(bright);
+
+    if(getColorByName(command).name != "Black") {
+      single->fill(command);
+    }
 
     // if(command == "arc") {
     //   arcReactor(ring);
