@@ -32,7 +32,7 @@ void setup() {
   single = new NeoPixelSegment(&pixels, 12, 1);
 
   pinMode(2, INPUT);
-  attachInterrupt(digitalPinToInterrupt(2), handleButtonPress, RISING);
+  attachInterrupt(digitalPinToInterrupt(2), handleButtonPressIsr, FALLING);
 
   Serial.begin(230400);
   while(!Serial) {
@@ -56,29 +56,32 @@ String command = "";
 String subcommand = "";
 String originalCommand = "";
 
-unsigned previousMillis = -1;
+unsigned previousMs = -1;
+unsigned buttonTriggerMs = -1;
+int deltaMs = 0;
+
 unsigned long iterations = 0;
-int delta = 0;
+
 bool tick = false;
 bool buttonPressed = false;
 
 void loop() {
   // Get the delta, trying to make a 5ms clock here for driving LEDs
-  delta = millis() - previousMillis;
-  if(delta >= 10) {
-    previousMillis = millis();
+  deltaMs = millis() - previousMs;
+  if(deltaMs >= 10) {
+    previousMs = millis();
     iterations++;
     tick = true;
   } else {
     tick = false;
   }
 
-  if(tick) {
-    if(buttonPressed && (iterations % 10 == 0)) {
-      buttonPressed = false;
-      single->fill(getRandomColor().name);
-    }
+  if(buttonPressed) {
+    buttonPressed = false;
+    single->fill(getRandomColor().name);
+  }
 
+  if(tick) {
     if(iterations % 5 == 0) {
       ring->animate();
     }
@@ -103,25 +106,9 @@ void loop() {
 }
 
 // Do something interesting with this button press :D
-void handleButtonPress() {
-  buttonPressed = true;
-}
-
-RgbColor getFireColor() {
-  uint8_t r = random(180, 255);
-  uint8_t g = random(64, 128);
-
-  if (g > r) {
-    g = r;
+void handleButtonPressIsr() {
+  if(millis() - buttonTriggerMs > 500) {
+    buttonPressed = true;
   }
-
-  return RgbColor("", r, g, 0);
-}
-
-void fire(NeoPixelSegment& segment) {
-  for (int i = 0; i < segment.getLength(); i++) {
-    segment.setPixelColor(i, getFireColor());
-    segment.setPixelBrightness(i, random(8, 16));
-  }
-  segment.show();
+  buttonTriggerMs = millis();
 }
