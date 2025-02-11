@@ -1,18 +1,8 @@
 #include "colors.h"
 
-extern RgbColor colors[] = {
-  // RgbColor("Red", 255, 0, 0),
-  // RgbColor("Green", 0, 255, 0),
-  // RgbColor("Blue", 0, 0, 255),
-  // RgbColor("Yellow", 255, 255, 0),
-  // RgbColor("Cyan", 0, 255, 255),
-  // RgbColor("Magenta", 255, 0, 255),
-  // RgbColor("Silver", 192, 192, 192),
-  // RgbColor("Gray", 128, 128, 128),
-  // RgbColor("Maroon", 128, 0, 0),
-  // RgbColor("Olive", 128, 128, 0),
-  // RgbColor("Dark Green", 0, 128, 0)
+#define NUM_COLORS 12
 
+extern RgbColor colors[] = {
   RgbColor("red", 255, 0, 0),      
   RgbColor("orange", 255, 128, 0),    
   RgbColor("yellow", 255, 255, 0),    
@@ -28,11 +18,15 @@ extern RgbColor colors[] = {
 };
 
 RgbColor getColorByName(String colorName) {
-  for (int i = 0; i < 11; i++) {
+  for (int i = 0; i < NUM_COLORS; i++) {
     if (colors[i].name.equalsIgnoreCase(colorName)) {
       return colors[i];
     }
   }
   // Return a default color (black) if the color name is not found
   return RgbColor("Black", 0, 0, 0);
+}
+
+RgbColor getRandomColor() {
+  return colors[random(0, NUM_COLORS)];
 }

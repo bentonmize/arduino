@@ -30,5 +30,6 @@ class RgbColor {
 };
 
 RgbColor getColorByName(String colorName);
+RgbColor getRandomColor();
 
 #endif
