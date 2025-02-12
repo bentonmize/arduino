@@ -17,6 +17,7 @@
 #include "animation.h"
 #include "NeoPixelSegment.h"
 #include "colors.h"
+#include "animation.h"
 #include <pins_arduino.h>
 
 #define NEO_PIN   6   // Pin where I2C is setup
@@ -25,32 +26,6 @@
 Adafruit_NeoPixel pixels(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
 NeoPixelSegment* ring;
 NeoPixelSegment* single;
-
-void setup() {
-  pixels.begin(); // init NeoPixel array object (REQUIRED)
-  ring = new NeoPixelSegment(&pixels, 0, 12);
-  single = new NeoPixelSegment(&pixels, 12, 1);
-
-  pinMode(2, INPUT);
-  attachInterrupt(digitalPinToInterrupt(2), handleButtonPressIsr, FALLING);
-
-  Serial.begin(230400);
-  while(!Serial) {
-    delay(10);
-  }
-
-  pinMode(2, INPUT);
-
-  Serial.println("Initialized!");
-
-  ring->fill("green");
-  single->fill("blue");
-
-  single->setBrightness(4);
-  ring->setBrightness(8);
-
-  ring->setAnimation(fire);
-}
 
 String command = "";
 String subcommand = "";
@@ -65,6 +40,32 @@ unsigned long iterations = 0;
 bool tick = false;
 bool buttonPressed = false;
 
+FireState fireState;
+PulseState pulseState;
+
+void setup() {
+  pixels.begin(); // init NeoPixel array object (REQUIRED)
+  ring = new NeoPixelSegment(&pixels, 0, 12);
+  single = new NeoPixelSegment(&pixels, 12, 1);
+
+  pinMode(2, INPUT);
+  attachInterrupt(digitalPinToInterrupt(2), handleButtonPressIsr, FALLING);
+
+  Serial.begin(230400);
+  while(!Serial) {
+    delay(10);
+  }
+
+  setupAnimations();
+
+  Serial.println("Initialized!");
+}
+
+void setupAnimations() {
+  fireState = FireState();
+  pulseState = PulseState();  
+}
+
 void loop() {
   // Get the delta, trying to make a 5ms clock here for driving LEDs
   deltaMs = millis() - previousMs;
@@ -76,15 +77,16 @@ void loop() {
     tick = false;
   }
 
+  // Check button presses
   if(buttonPressed) {
     buttonPressed = false;
     single->fill(getRandomColor().name);
   }
 
+  // Running every 10ms
   if(tick) {
-    if(iterations % 5 == 0) {
-      ring->animate();
-    }
+    ring->animate(fire, iterations, fireState);
+    single->animate(pulse, iterations, pulseState);
   } 
 
   // If we have serial work to do handle it

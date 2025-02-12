@@ -3,6 +3,7 @@
 
 #include <Adafruit_NeoPixel.h>
 #include "colors.h"
+#include "animation.h"
 
 class NeoPixelSegment {
   private:
@@ -15,7 +16,6 @@ class NeoPixelSegment {
     */
     RgbColor* colors;
     uint8_t* brightness;
-    void (*animationFunction)(NeoPixelSegment& segment);
 
   public:
     NeoPixelSegment(Adafruit_NeoPixel* pixels, int startIdx, int length) {
@@ -91,12 +91,9 @@ class NeoPixelSegment {
         pixels->show();
     }
 
-    void setAnimation(void (*inputAnimation)(NeoPixelSegment& segment)) {
-       animationFunction = inputAnimation;
-    }
-
-    void animate() {
-        animationFunction(*this);
+    template <typename T>
+    void animate(void (*animationFunc)(NeoPixelSegment&, unsigned long, T&),  unsigned long ticks, T& state) {
+      animationFunc(*this, ticks, state);
     }
 };
 
