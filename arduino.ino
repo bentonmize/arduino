@@ -19,6 +19,7 @@
 #include "colors.h"
 #include "animation.h"
 #include <pins_arduino.h>
+#include "serial.h"
 
 #define NEO_PIN   6   // Pin where I2C is setup
 #define NUMPIXELS 13  // One ring and then an additional
@@ -26,10 +27,6 @@
 Adafruit_NeoPixel pixels(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
 NeoPixelSegment* ring;
 NeoPixelSegment* single;
-
-String command = "";
-String subcommand = "";
-String originalCommand = "";
 
 unsigned previousMs = -1;
 unsigned buttonTriggerMs = -1;
@@ -43,6 +40,8 @@ bool buttonPressed = false;
 FireState fireState;
 PulseState pulseState;
 
+SerialState serialState = SerialState();
+
 void setup() {
   pixels.begin(); // init NeoPixel array object (REQUIRED)
   ring = new NeoPixelSegment(&pixels, 0, 12);
@@ -51,6 +50,7 @@ void setup() {
   pinMode(2, INPUT);
   attachInterrupt(digitalPinToInterrupt(2), handleButtonPressIsr, FALLING);
 
+  initSerialState(serialState);
   Serial.begin(230400);
   while(!Serial) {
     delay(10);
@@ -89,21 +89,19 @@ void loop() {
     single->animate(pulse, iterations, pulseState);
   } 
 
-  // If we have serial work to do handle it
-  if(Serial.available() > 0) {
-    command = Serial.readString();
-    command.trim();
+  checkSerial(serialState);
 
-    originalCommand = command;
+  if(serialState.commandReceived) {
+    serialState.commandReceived = false;
+    processCommands(serialState.commands);
+  }
+}
 
-    uint8_t hyphenIndex = command.indexOf('-');
-    if(hyphenIndex > 0) {
-      subcommand = command.substring(hyphenIndex+1);
-      command = command.substring(0, hyphenIndex);
-    }
-
-    Serial.println(originalCommand);
-    command = "";
+void processCommands(String commands[]) {
+  if(commands[0].equalsIgnoreCase("onair")) {
+    single->fill(commands[1]);
+  } else if(commands[1].equalsIgnoreCase("ring")) {
+    ring->fill(commands[1]);
   }
 }
 
