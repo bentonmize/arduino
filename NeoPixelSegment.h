@@ -16,6 +16,7 @@ class NeoPixelSegment {
     */
     RgbColor* colors;
     uint8_t* brightness;
+    bool animating = true;
 
   public:
     NeoPixelSegment(Adafruit_NeoPixel* pixels, int startIdx, int length) {
@@ -93,7 +94,17 @@ class NeoPixelSegment {
 
     template <typename T>
     void animate(void (*animationFunc)(NeoPixelSegment&, unsigned long, T&),  unsigned long ticks, T& state) {
-      animationFunc(*this, ticks, state);
+      if(this->animating) {
+        animationFunc(*this, ticks, state);
+      }
+    }
+
+    void setAnimating(bool animate) {
+      this->animating = animate;
+    }
+
+    bool getAnimating() {
+      return this->animating;
     }
 };
 

@@ -15,7 +15,7 @@
  #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
 #include "animation.h"
-#include "NeoPixelSegment.h"
+#include "neopixelsegment.h"
 #include "colors.h"
 #include "animation.h"
 #include <pins_arduino.h>
@@ -39,6 +39,8 @@ bool buttonPressed = false;
 
 FireState fireState;
 PulseState pulseState;
+PulseState ringPulseState;
+ProgressState progressState;
 
 SerialState serialState = SerialState();
 
@@ -63,7 +65,18 @@ void setup() {
 
 void setupAnimations() {
   fireState = FireState();
-  pulseState = PulseState();  
+
+  pulseState = PulseState();
+  pulseState.max = 128;
+  pulseState.min = 32;
+  pulseState.increment = 5;
+  pulseState.rate = 6;
+
+  ringPulseState = PulseState();
+  ringPulseState.rate = 10;
+
+  single->fill("red");
+  ring->fill("blue");
 }
 
 void loop() {
@@ -80,12 +93,15 @@ void loop() {
   // Check button presses
   if(buttonPressed) {
     buttonPressed = false;
-    single->fill(getRandomColor().name);
+    // single->fill(getRandomColor().name);
+    single->setAnimating(!single->getAnimating());
+    ring->setAnimating(!ring->getAnimating());
   }
 
   // Running every 10ms
   if(tick) {
-    ring->animate(fire, iterations, fireState);
+    // ring->animate(pulse, iterations, ringPulseState);
+    ring->animate(progress, iterations, progressState);
     single->animate(pulse, iterations, pulseState);
   } 
 
@@ -93,6 +109,8 @@ void loop() {
 
   if(serialState.commandReceived) {
     serialState.commandReceived = false;
+    Serial.println("Command received!");
+    Serial.println(serialState.commands[0] + " " + serialState.commands[1]);
     processCommands(serialState.commands);
   }
 }
@@ -100,8 +118,10 @@ void loop() {
 void processCommands(String commands[]) {
   if(commands[0].equalsIgnoreCase("onair")) {
     single->fill(commands[1]);
-  } else if(commands[1].equalsIgnoreCase("ring")) {
+    single->show();
+  } else if(commands[0].equalsIgnoreCase("ring")) {
     ring->fill(commands[1]);
+    single->show();
   }
 }
 

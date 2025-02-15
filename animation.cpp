@@ -44,3 +44,23 @@ void pulse(NeoPixelSegment& segment, unsigned long ticks, PulseState& state) {
     segment.show();
   }
 }
+
+void progress(NeoPixelSegment& segment, unsigned long ticks, ProgressState& state) {
+  if(ticks % state.rate == 0) {
+    segment.setBrightness(4);
+    if(segment.getLength() == 12) {
+      int start_bright = segment.getLength();
+      for(int i = 0; i < 12; i++) {
+        segment.setPixelBrightness(state.rotationPins[i], start_bright - (i));
+      }
+
+      for(int i = 0; i < segment.getLength(); i++) {
+        state.rotationPins[i] = state.rotationPins[i] + 1;
+        if(state.rotationPins[i] >= segment.getLength()) {
+          state.rotationPins[i] = 0;
+        }
+      }
+    }
+    segment.show();
+  }
+}
