@@ -17,7 +17,8 @@ class NeoPixelSegment {
     RgbColor* colors;
     uint8_t* brightness;
     bool animating = true;
-
+    String animateCommand = "";
+    
   public:
     NeoPixelSegment(Adafruit_NeoPixel* pixels, int startIdx, int length) {
       this->pixels = pixels;

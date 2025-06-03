@@ -16,9 +16,9 @@ void fire(NeoPixelSegment& segment, unsigned long ticks, FireState& state) {
   if(ticks % state.rate == 0) {
       for (int i = 0; i < segment.getLength(); i++) {
         segment.setPixelColor(i, getFireColor());
-        segment.setPixelBrightness(i, random(8, 16));
+        segment.setPixelBrightness(i, random(4, 10));
       }
-      segment.setBrightness(random(10, 16));
+      // segment.setBrightness(random(4, 10));
       segment.show();
   }
 }
@@ -49,9 +49,13 @@ void progress(NeoPixelSegment& segment, unsigned long ticks, ProgressState& stat
   if(ticks % state.rate == 0) {
     segment.setBrightness(4);
     if(segment.getLength() == 12) {
-      int start_bright = segment.getLength();
+      int start_bright = segment.getLength() / 2;
       for(int i = 0; i < 12; i++) {
-        segment.setPixelBrightness(state.rotationPins[i], start_bright - (i));
+        if(i < segment.getLength()/2) {
+          segment.setPixelBrightness(state.rotationPins[i], min(start_bright + (i), segment.getLength()/2));
+        } else {
+          segment.setPixelBrightness(state.rotationPins[i], max(start_bright - (i), 1));
+        }
       }
 
       for(int i = 0; i < segment.getLength(); i++) {

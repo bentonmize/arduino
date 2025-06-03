@@ -42,6 +42,8 @@ PulseState pulseState;
 PulseState ringPulseState;
 ProgressState progressState;
 
+String ringAnimation = "fire";
+
 SerialState serialState = SerialState();
 
 void setup() {
@@ -75,7 +77,10 @@ void setupAnimations() {
   ringPulseState = PulseState();
   ringPulseState.rate = 10;
 
-  single->fill("red");
+  progressState = ProgressState();
+  progressState.rate = 3;
+
+  single->fill("blue");
   ring->fill("blue");
 }
 
@@ -94,14 +99,15 @@ void loop() {
   if(buttonPressed) {
     buttonPressed = false;
     // single->fill(getRandomColor().name);
-    single->setAnimating(!single->getAnimating());
-    ring->setAnimating(!ring->getAnimating());
+    // single->setAnimating(!single->getAnimating());
+    // ring->setAnimating(!ring->getAnimating());
   }
 
   // Running every 10ms
   if(tick) {
     // ring->animate(pulse, iterations, ringPulseState);
-    ring->animate(progress, iterations, progressState);
+    runRingAnimation(ringAnimation);
+    // ring->animate(progress, iterations, progressState);
     single->animate(pulse, iterations, pulseState);
   } 
 
@@ -109,18 +115,35 @@ void loop() {
 
   if(serialState.commandReceived) {
     serialState.commandReceived = false;
-    Serial.println("Command received!");
-    Serial.println(serialState.commands[0] + " " + serialState.commands[1]);
-    processCommands(serialState.commands);
+    Serial.println("Commands received!");
+    for(int i=0; i < serialState.numOfCommands; i++) {
+      Serial.print(serialState.commands[i]);
+      Serial.print(" ");
+    }
+    Serial.println();
+    processCommands(serialState.commands, serialState.numOfCommands);
   }
 }
 
-void processCommands(String commands[]) {
+void runRingAnimation(String animateCommand) {
+  if(animateCommand.equalsIgnoreCase("fire")) {
+    ring->animate(fire, iterations, fireState);
+  } else if(animateCommand.equalsIgnoreCase("pulse")) {
+    ring->animate(pulse, iterations, ringPulseState);
+  } else if(animateCommand.equalsIgnoreCase("progress")) {
+    ring->animate(progress, iterations, progressState);
+  }
+}
+
+void processCommands(String commands[], int numCommands) {
   if(commands[0].equalsIgnoreCase("onair")) {
     single->fill(commands[1]);
     single->show();
   } else if(commands[0].equalsIgnoreCase("ring")) {
     ring->fill(commands[1]);
+    if(numCommands == 3) {
+      ringAnimation = commands[2];
+    }
     single->show();
   }
 }

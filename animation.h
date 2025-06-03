@@ -20,6 +20,10 @@ struct ProgressState {
   int rate = 3;
   uint8_t rotationPins[12] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 };
+struct Animation {
+  void (*func);
+  void* state;
+};
 
 void fire(NeoPixelSegment& segment, unsigned long ticks, FireState& state);
 void pulse(NeoPixelSegment& segment, unsigned long ticks, PulseState& state);

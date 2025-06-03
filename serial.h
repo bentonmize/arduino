@@ -4,7 +4,8 @@
 #include <Arduino.h>
 
 struct SerialState {
-  String commands[2] = {"", ""};
+  String commands[5] = {"", "", "", "", ""};
+  uint8_t numOfCommands = 0;
   String buffer = "";
   boolean commandReceived = false;
   bool receiving = false;
